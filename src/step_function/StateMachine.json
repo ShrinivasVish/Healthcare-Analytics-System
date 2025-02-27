@@ -1,0 +1,28 @@
+{
+    "StartAt": "CopyToRedShift",
+    "States": {
+      "CopyToRedShift": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:<aws-region>:<account-id>:function:CopyToRedShiftLambda",
+        "Parameters": {
+          "s3_bucket.$": "$.s3_bucket",
+          "s3_key.$": "$.s3_key"
+        },
+        "ResultPath": "$.copy_to_redshift_lambda_response",
+        "Next": "TransformToGold"
+      },
+      "TransformToGold": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:<aws-region>:<account-id>:function:TransformToGoldLambda",
+        "Parameters": {
+          "steps.$": "$.steps"
+        },
+        "Next": "ExecuteAnalyticalQueries"
+      },
+      "ExecuteAnalyticalQueries": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:<aws-region>:<account-id>:function:ExecuteAnalyticalQueriesLambda",
+        "End": true
+      }
+    }
+  }
